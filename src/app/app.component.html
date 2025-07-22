@@ -25,81 +25,323 @@
 
   </section> -->
 
-<section>
-  <div class="container my-4">
-    <h1 class="text-center mb-4 heading">Drafting Legal Documents</h1>
+<section [class.generated-active]="showGeneratedInterface">
+  <!-- Form View (Hidden when split view or generated interface is active) -->
+  <div class="container" *ngIf="!showSplitView && !showGeneratedInterface">
+    <h1 class="heading">Drafting Legal Documents</h1>
 
-    <!-- ✅ Wrap entire stepper once -->
-    <form [formGroup]="stepForm">
-      <mat-horizontal-stepper linear class="custom-stepper">
-
-        <!-- Step 1 -->
-        <mat-step [stepControl]="stepForm.get('state')!">
-          <mat-form-field appearance="fill" class="w-100">
-            <mat-label>Select State</mat-label>
-            <mat-select formControlName="state" (selectionChange)="onStateChange()">
-              <mat-option *ngFor="let state of states" [value]="state">{{ state }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div class="mt-3">
-            <button mat-raised-button color="primary" matStepperNext [disabled]="!stepForm.get('state')?.valid">
-              Next
-            </button>
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="stepForm">
+          
+          <!-- Step 1: Select State -->
+          <div class="selection-step">
+            <h5 class="step-title">
+              <mat-icon class="step-icon">location_on</mat-icon>
+              Step 1: Select State
+            </h5>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Choose your state</mat-label>
+              <mat-select formControlName="state" (selectionChange)="onStateChange()">
+                <mat-option *ngFor="let state of states" [value]="state">{{ state }}</mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
-        </mat-step>
 
-        <!-- Step 2 -->
-        <mat-step [stepControl]="stepForm.get('category')!">
-          <mat-form-field appearance="fill" class="w-100">
-            <mat-label>Select Category</mat-label>
-            <mat-select formControlName="category" (selectionChange)="onCategoryChange()">
-              <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div class="mt-3">
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-raised-button color="primary" matStepperNext [disabled]="!stepForm.get('category')?.valid">
-              Next
-            </button>
+          <!-- Step 2: Select Category -->
+          <div class="selection-step" *ngIf="stepForm.get('state')?.value && categories.length > 0">
+            <h5 class="step-title">
+              <mat-icon class="step-icon">category</mat-icon>
+              Step 2: Select Category
+            </h5>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Choose document category</mat-label>
+              <mat-select formControlName="category" (selectionChange)="onCategoryChange()">
+                <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat }}</mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
-        </mat-step>
 
-        <!-- Step 3 -->
-        <mat-step [stepControl]="stepForm.get('subcategory')!">
-          <mat-form-field appearance="fill" class="w-100">
-            <mat-label>Select Document</mat-label>
-            <mat-select formControlName="subcategory" (selectionChange)="onSubcategoryChange()">
-              <mat-option *ngFor="let sub of subcategories" [value]="sub">{{ sub }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div class="mt-3">
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-raised-button color="primary" matStepperNext [disabled]="!stepForm.get('subcategory')?.valid">
-              Next
-            </button>
+          <!-- Step 3: Select Document -->
+          <div class="selection-step" *ngIf="stepForm.get('category')?.value && subcategories.length > 0">
+            <h5 class="step-title">
+              <mat-icon class="step-icon">description</mat-icon>
+              Step 3: Select Document Type
+            </h5>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Choose specific document</mat-label>
+              <mat-select formControlName="subcategory" (selectionChange)="onSubcategoryChange()">
+                <mat-option *ngFor="let sub of subcategories" [value]="sub">{{ sub }}</mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
-        </mat-step>
 
-        <!-- Step 4 -->
-        <mat-step [stepControl]="formDataGroup">
-          <form [formGroup]="formDataGroup" (ngSubmit)="onSubmit()">
-            <div *ngFor="let field of dynamicFields" class="mb-3">
-              <mat-form-field appearance="fill" class="w-100" *ngIf="field.type !== 'textarea'">
-                <mat-label>{{ field.label }}</mat-label>
-                <input matInput [type]="field.type" [formControlName]="field.controlName" />
-              </mat-form-field>
-
-              <mat-form-field appearance="fill" class="w-100" *ngIf="field.type === 'textarea'">
-                <mat-label>{{ field.label }}</mat-label>
-                <textarea matInput [formControlName]="field.controlName"></textarea>
-              </mat-form-field>
+          <!-- Step 4: Select Template -->
+          <div class="selection-step" *ngIf="stepForm.get('subcategory')?.value && templates.length > 0">
+            <h5 class="step-title">
+              <mat-icon class="step-icon">assignment</mat-icon>
+              Step 4: Select Template
+            </h5>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Choose template variation</mat-label>
+              <mat-select formControlName="template" (selectionChange)="onTemplateChange()">
+                <mat-option *ngFor="let template of templates" [value]="template">{{ template }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <!-- Next Button after Step 4 -->
+            <div class="text-center mt-3" *ngIf="stepForm.get('template')?.value">
+              <button mat-raised-button color="primary" type="button" (click)="onNextClick()" class="next-btn">
+                <mat-icon>arrow_forward</mat-icon>
+                Next
+              </button>
             </div>
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-raised-button color="accent" type="submit" [disabled]="!formDataGroup.valid">Submit</button>
-          </form>
-        </mat-step>
+          </div>
 
-      </mat-horizontal-stepper>
-    </form>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split View (PDF + Chatbot + Form) -->
+    <!-- Split View Container (Hidden when generated interface is active) -->
+  <div class="split-container" *ngIf="showSplitView && !showGeneratedInterface">
+    
+    <!-- Left Half: Form + Chatbot -->
+    <div class="left-panel">
+      
+      <!-- Back Button -->
+      <div class="back-btn-container">
+        <button mat-stroked-button (click)="goBackToForm()" class="back-btn">
+          <mat-icon>arrow_back</mat-icon>
+          Back to Selection
+        </button>
+      </div>
+
+      <!-- Form Section (Always show when template is selected) -->
+      <div class="form-section" *ngIf="stepForm.get('template')?.value">
+        <h4 class="section-title">
+          <mat-icon>edit</mat-icon>
+          Fill Document Details
+        </h4>
+        
+        <div class="dynamic-form" [formGroup]="formDataGroup" *ngIf="dynamicFields.length > 0; else noFieldsTemplate">
+          <div *ngFor="let field of dynamicFields" class="mb-3">
+            <mat-form-field appearance="outline" class="w-100" *ngIf="field.type !== 'textarea'">
+              <mat-label>{{ field.label }}</mat-label>
+              <input matInput [type]="field.type" [formControlName]="field.controlName" 
+                    [placeholder]="field.label" [title]="field.label" />
+              <mat-hint *ngIf="field.required">Required</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-100" *ngIf="field.type === 'textarea'">
+              <mat-label>{{ field.label }}</mat-label>
+              <textarea matInput rows="3" [formControlName]="field.controlName"
+                      [placeholder]="field.label" [title]="field.label"></textarea>
+              <mat-hint *ngIf="field.required">Required</mat-hint>
+            </mat-form-field>
+          </div>
+          
+          <div class="text-center mt-3">
+            <button mat-raised-button color="primary" type="button" (click)="onSubmit()" 
+                    [disabled]="!formDataGroup.valid || isGenerating" class="submit-btn">
+              <mat-icon *ngIf="!isGenerating">send</mat-icon>
+              <mat-icon *ngIf="isGenerating" class="spinning">hourglass_empty</mat-icon>
+              {{ isGenerating ? 'Generating...' : 'Generate Document' }}
+            </button>
+          </div>
+        </div>
+        
+        <!-- Template when no fields are available -->
+        <ng-template #noFieldsTemplate>
+          <div class="no-fields-message">
+            <mat-icon>info</mat-icon>
+            <p>This template is ready to generate. Click below to proceed.</p>
+            <div class="text-center mt-3">
+              <button mat-raised-button color="primary" type="button" (click)="onSubmit()" class="submit-btn"
+                      [disabled]="isGenerating">
+                <mat-icon *ngIf="!isGenerating">send</mat-icon>
+                <mat-icon *ngIf="isGenerating" class="spinning">hourglass_empty</mat-icon>
+                {{ isGenerating ? 'Generating...' : 'Generate Document' }}
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Chatbot Section -->
+      <div class="chatbot-section">
+        <h4 class="section-title">
+          <mat-icon>support_agent</mat-icon>
+          AI Assistant
+        </h4>
+        
+        <div class="chat-container">
+          <div class="chat-messages">
+            <div *ngFor="let message of chatMessages" 
+                 [class]="message.isUser ? 'user-message' : 'bot-message'"
+                 class="message">
+              <div class="message-content">
+                <p>{{ message.text }}</p>
+                <small class="timestamp">{{ message.timestamp | date:'short' }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Chat Input - Fixed at bottom -->
+        <div class="chat-input-section">
+          <div class="chat-input">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Type your question...</mat-label>
+              <input matInput [(ngModel)]="currentMessage" 
+                     (keyup.enter)="sendMessage()" 
+                     placeholder="Ask me anything about this document"
+                     title="Chat input">
+            </mat-form-field>
+            <button mat-icon-button color="primary" (click)="sendMessage()" 
+                    [disabled]="!currentMessage.trim()"
+                    title="Send message">
+              <mat-icon>send</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Half: PDF Viewer -->
+    <div class="right-panel">
+      <div class="pdf-header">
+        <h4 class="section-title">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Document Template Preview
+        </h4>
+      </div>
+      
+      <div class="pdf-container">
+        <div *ngIf="selectedPdfPath && safePdfUrl; else noPdfTemplate" class="pdf-wrapper">
+          <!-- Enhanced PDF Embed -->
+          <iframe [src]="safePdfUrl" 
+                  class="pdf-viewer"
+                  title="Document Template Preview"
+                  width="100%"
+                  height="100%"
+                  frameborder="0"
+                  scrolling="auto"
+                  allowfullscreen>
+          </iframe>
+        </div>
+        
+        <ng-template #noPdfTemplate>
+          <div class="no-pdf-message">
+            <mat-icon class="large-icon">description</mat-icon>
+            <h3>Template Preview</h3>
+            <p>Select a document category to view the template</p>
+            <p><small>Note: Make sure PDF files are placed in <code>src/assets/templates/</code></small></p>
+          </div>
+        </ng-template>
+      </div>
+      
+      <!-- PDF Actions - Fixed at bottom -->
+      <div class="pdf-actions" *ngIf="selectedPdfPath && safePdfUrl">
+        <div class="text-center">
+          <button mat-stroked-button color="primary" (click)="downloadPdf()" class="mr-2">
+            <mat-icon>download</mat-icon>
+            Download PDF
+          </button>
+          <button mat-stroked-button color="accent" (click)="openPdfInNewTab()">
+            <mat-icon>open_in_new</mat-icon>
+            Open in New Tab
+          </button>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- Generated Document Interface (Full Screen) -->
+  <div class="generated-document-interface" *ngIf="showGeneratedInterface">
+    
+    <!-- Header -->
+    <div class="generated-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="generated-title">
+          <mat-icon>description</mat-icon>
+          Generated Legal Document
+        </h2>
+        <button mat-stroked-button (click)="goBackToFormFromGenerated()" class="back-btn">
+          <mat-icon>arrow_back</mat-icon>
+          Back to Form
+        </button>
+      </div>
+    </div>
+
+    <!-- Document Information -->
+    <div class="document-info-card">
+      <h4>
+        <mat-icon>info</mat-icon>
+        Document Information
+      </h4>
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>State</strong>
+          <span>{{ stepForm.get('state')?.value }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Category</strong>
+          <span>{{ stepForm.get('category')?.value }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Document Type</strong>
+          <span>{{ stepForm.get('subcategory')?.value }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Template</strong>
+          <span>{{ stepForm.get('template')?.value }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Generated</strong>
+          <span>{{ documentGeneratedTime }}</span>
+        </div>
+        <div class="info-item" *ngIf="generatedDocumentId">
+          <strong>Document ID</strong>
+          <span>{{ generatedDocumentId }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Document Content -->
+    <div class="generated-document-content">
+      <h4>
+        <mat-icon>article</mat-icon>
+        Document Content
+      </h4>
+      <div class="document-viewer-container">
+        <div class="document-text-area">
+          <pre>{{ generatedDocument }}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="generated-actions-bar">
+      <div class="actions-container">
+        <button mat-raised-button color="primary" (click)="downloadGeneratedPdf()" class="action-btn">
+          <mat-icon>download</mat-icon>
+          Download PDF
+        </button>
+        
+        <button mat-stroked-button color="accent" (click)="printGeneratedDocument()" class="action-btn">
+          <mat-icon>print</mat-icon>
+          Print Document
+        </button>
+
+        <button mat-stroked-button color="warn" (click)="goBackToFormFromGenerated()" class="action-btn">
+          <mat-icon>edit</mat-icon>
+          Create New Document
+        </button>
+      </div>
+    </div>
+
   </div>
 </section>
