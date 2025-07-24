@@ -163,6 +163,39 @@ mat-form-field {
   margin-top: 1rem;
 }
 
+// Template Preview Section Styles
+.template-preview-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #f8f9fa;
+  border-left: 4px solid #28a745;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.mini-pdf-container {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mini-pdf-viewer {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.preview-actions {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.preview-btn {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+
 // Split View Styles
 .split-container {
   display: flex;
