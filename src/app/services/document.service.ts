@@ -26,11 +26,25 @@ export interface DocumentGenerationResponse {
   message: string;
 }
 
+export interface DocumentQuestionRequest {
+  question: string;
+  document_template: string;
+  current_template_content?: string;
+}
+
+export interface DocumentQuestionResponse {
+  success: boolean;
+  answer: string;
+  guidance: string;
+  relevant_fields: string[];
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class DocumentService {
-  private baseUrl = 'http://localhost:8000/api';
+  private baseUrl = 'http://localhost:8000/api';  // Changed back to correct port 8000
 
   constructor(private http: HttpClient) { }
 
@@ -46,5 +60,9 @@ export class DocumentService {
 
   checkHealth(): Observable<any> {
     return this.http.get(`${this.baseUrl}/health`);
+  }
+
+  askAIAssistant(request: DocumentQuestionRequest): Observable<DocumentQuestionResponse> {
+    return this.http.post<DocumentQuestionResponse>(`${this.baseUrl}/ai-assistant`, request);
   }
 }

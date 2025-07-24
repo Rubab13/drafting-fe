@@ -25,38 +25,65 @@ export const LEGAL_DOCUMENTS_DATA = {
         "One-Way NDA for Consultants", 
         "One-Way NDA for Vendors"
       ],
+      "Employee Non-Disclosure Agreement (ENDA)": [
+        "Basic ENDA Template",
+        "ENDA for New Employees",
+        "ENDA for Contract Employees",
+        "ENDA for Consulting Firms",
+        "ENDA for Freelancers"
+      ],
       "Non-Disclosure and Non-Compete Agreement (NDNC)": [
         "Basic NDNC Template",
         "NDNC for Employees",
-        "NDNC for Executives",
-        "NDNC for Business Owners"
+        "NDNC for Executives"
       ],
       "Confidentiality and Non-Disclosure Agreement (CNA)": [
         "Basic CNA Template",
         "CNA for Business Partnerships",
-        "CNA for Mergers and Acquisitions",
-        "CNA for Strategic Alliances"
+        "CNA for Mergers and Acquisitions"
       ]
     },
     // ⚖️ Legal Affidavits
     "Affidavits": {
       "General Affidavit": [
         "Basic Affidavit Template",
-        "General Affidavit for Truth",
         "Affidavit of Identity",
         "Affidavit of Residence"
       ],
       "Financial Affidavit": [
-        "Financial Affidavit for Debt",
-        "Financial Affidavit for Bankruptcy",
+        "Financial Affidavit",
         "Affidavit of Income",
-        "Affidavit of Assets"
+        "Affidavit of Income for Employment"
       ],
-      "Identity Affidavit": [
-        "Affidavit of Identity for Individuals",
-        "Affidavit of Identity for Businesses",
-        "Affidavit of Name Change",
-        "Affidavit of Citizenship"
+      "Death and Estate Affidavits": [
+        "Affidavit of Death",
+        "Affidavit of Domicile",
+        "Affidavit of Heirship",
+        "Small Estate Affidavit"
+      ],
+      "Property and Gift Affidavits": [
+        "Affidavit of Gift",
+        "Affidavit of Property Value",
+        "Affidavit of Property Ownership",
+        "Affidavit of No Lien"
+      ],
+      "Family and Personal Affidavits": [
+        "Affidavit of Paternity",
+        "Affidavit of Residency"
+      ],
+      "Employment Affidavits": [
+        "Affidavit of Employment",
+        "Affidavit of Job Offer",
+        "Affidavit of Termination"
+      ],
+      "Court and Legal Affidavits": [
+        "Affidavit of Service",
+        "Affidavit of Notice",
+        "Affidavit of Good Standing"
+      ],
+      "Business Affidavits": [
+        "Affidavit of Business Identity",
+        "Affidavit of Business Ownership"
       ]
     },
     // 🤝 Partnership Agreements
@@ -64,20 +91,20 @@ export const LEGAL_DOCUMENTS_DATA = {
       "General Partnership Agreement": [
         "Basic Partnership Agreement Template",
         "General Partnership Agreement for Business",
-        "Partnership Agreement for Joint Venture",
-        "Partnership Agreement for Limited Liability Partnership (LLP)"
+        "Business Partnership Agreement Template",
+        "Business Partnership Agreement for Small Business"
+      ],
+      "Business Partnership Agreement": [
+        "Business Partnership Agreement for Startup",
+        "Business Partnership Agreement for Entrepreneur",
+        "Partnership Agreement for Joint Venture"
       ],
       "Limited Partnership Agreement": [
-        "Limited Partnership Agreement Template",
-        "Limited Partnership Agreement for Private Equity",
-        "Limited Partnership Agreement for Venture Capital",
-        "Limited Partnership Agreement for Real Estate"
+        "Limited Partnership Agreement Template"
       ],
-      "Joint Venture Partnership Agreement": [
-        "Joint Venture Partnership Agreement Template",
-        "Joint Venture Partnership Agreement for Business",
-        "Joint Venture Partnership Agreement for Project",
-        "Joint Venture Partnership Agreement for Investment"
+      "Strategic Partnership Agreement": [
+        "Strategic Partnership Agreement Template",
+        "Strategic Partnership Agreement for Technology"
       ]
     },
     // 📋 Memorandum of Understanding (MOU)
@@ -91,14 +118,17 @@ export const LEGAL_DOCUMENTS_DATA = {
       "Business MOU": [
         "Business MOU Template",
         "MOU for Joint Venture",
-        "MOU for Strategic Alliance",
-        "MOU for Supply Chain Partnership"
+        "MOU for Strategic Alliance"
       ],
       "International MOU": [
         "International MOU Template",
-        "MOU for International Partnership",
-        "MOU for Global Collaboration",
-        "MOU for Cross-Border Transaction"
+        "MOU for International Partnership"
+      ],
+      "Technology MOU": [
+        "Technology MOU Template",
+        "MOU for Software Development",
+        "MOU for Technology Partnership",
+        "MOU for Licensing Agreement"
       ]
     }
   },
@@ -112,14 +142,11 @@ export const LEGAL_DOCUMENTS_DATA = {
       "Employee Non-Disclosure Agreement (ENDA)": [
         "Basic ENDA Template",
         "ENDA for New Employees",
-        "ENDA for Existing Employees",
         "ENDA for Contract Employees"
       ],
       "Consultant Non-Disclosure Agreement (CNDA)": [
         "Basic CNDA Template",
-        "CNDA for Independent Contractors",
-        "CNDA for Consulting Firms",
-        "CNDA for Freelancers"
+        "CNDA for Independent Contractors"
       ]
     },
     // ⚖️ Legal Affidavits
@@ -133,7 +160,6 @@ export const LEGAL_DOCUMENTS_DATA = {
       "Business Affidavit": [
         "Affidavit of Business Identity",
         "Affidavit of Business Ownership",
-        "Affidavit of No Lien for Business",
         "Affidavit of Good Standing"
       ]
     },
@@ -166,8 +192,7 @@ export const LEGAL_DOCUMENTS_DATA = {
       "Real Estate Non-Disclosure Agreement (RENDA)": [
         "Basic RENDA Template",
         "RENDA for Buyers",
-        "RENDA for Sellers",
-        "RENDA for Real Estate Agents"
+        "RENDA for Sellers"
       ]
     },
     // ⚖️ Legal Affidavits
@@ -184,17 +209,14 @@ export const LEGAL_DOCUMENTS_DATA = {
       "Real Estate Partnership Agreement": [
         "Real Estate Partnership Agreement Template",
         "Real Estate Partnership Agreement for Development",
-        "Real Estate Partnership Agreement for Investment",
-        "Real Estate Partnership Agreement for Property Management"
+        "Real Estate Partnership Agreement for Investment"
       ]
     },
     // 📋 Memorandum of Understanding (MOU)
     "MOU": {
       "Real Estate MOU": [
         "Real Estate MOU Template",
-        "MOU for Property Development",
-        "MOU for Lease Agreement",
-        "MOU for Purchase and Sale"
+        "MOU for Property Development"
       ]
     }
   },
@@ -207,36 +229,27 @@ export const LEGAL_DOCUMENTS_DATA = {
     "NDA": {
       "Vendor Non-Disclosure Agreement (VNDA)": [
         "Basic VNDA Template",
-        "VNDA for Suppliers",
-        "VNDA for Service Providers",
-        "VNDA for Contractors"
+        "VNDA for Suppliers"
       ]
     },
     // ⚖️ Legal Affidavits
     "Affidavits": {
       "Court-Related Affidavit": [
         "Affidavit of Service",
-        "Affidavit of Notice",
-        "Affidavit of Non-Compliance",
-        "Affidavit of Default"
+        "Affidavit of Notice"
       ]
     },
     // 🤝 Partnership Agreements
     "Partnership Agreement": {
       "Strategic Partnership Agreement": [
         "Strategic Partnership Agreement Template",
-        "Strategic Partnership Agreement for Business",
-        "Strategic Partnership Agreement for Technology",
-        "Strategic Partnership Agreement for Marketing"
+        "Strategic Partnership Agreement for Technology"
       ]
     },
     // 📋 Memorandum of Understanding (MOU)
     "MOU": {
       "Government MOU": [
-        "Government MOU Template",
-        "MOU for Government Contract",
-        "MOU for Government Grant",
-        "MOU for Government Partnership"
+        "Government MOU Template"
       ]
     }
   }

@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { LEGAL_DOCUMENTS_DATA } from 'src/data/legal-documents-data';
 import { DOCUMENT_FIELDS } from 'src/data/document-fields';
-import { DocumentService, DocumentGenerationRequest, DocumentGenerationResponse } from './services/document.service';
+import { DocumentService, DocumentGenerationRequest, DocumentGenerationResponse, DocumentQuestionRequest, DocumentQuestionResponse } from './services/document.service';
 
 @Component({
   selector: 'app-root',
@@ -37,6 +37,9 @@ export class AppComponent {
   pdfDownloadUrl = '';
   showGeneratedInterface = false; // New property for generated document interface
   documentGeneratedTime = ''; // Property to store generation time
+  
+  // PDF loading error handling
+  pdfLoadError = false;
 
   constructor(
     private fb: FormBuilder, 
@@ -105,45 +108,140 @@ export class AppComponent {
 
   onTemplateChange() {
     const template = this.stepForm.get('template')?.value;
+    const category = this.stepForm.get('category')?.value;
+    
+    // Reset PDF error flag
+    this.pdfLoadError = false;
+    
+    console.log(`🔍 DEBUGGING - Template selected: "${template}"`);
+    console.log(`🔍 DEBUGGING - Available fields in fieldsMap:`, Object.keys(this.fieldsMap));
     
     this.dynamicFields = this.fieldsMap[template] || [];
+    
+    console.log(`🔍 DEBUGGING - Dynamic fields found:`, this.dynamicFields);
+    console.log(`🔍 DEBUGGING - Number of fields:`, this.dynamicFields.length);
 
     const group: any = {};
     this.dynamicFields.forEach(field => {
       group[field.controlName] = ['', field.required ? Validators.required : []];
     });
     this.formDataGroup = this.fb.group(group);
+
+    // Set PDF preview path based on selected template
+    this.setPdfPreviewPath(template, category);
+
+    console.log(`Template selected: ${template}`);
+    console.log(`PDF Path set to: ${this.selectedPdfPath}`);
+    console.log(`Safe PDF URL created: ${this.safePdfUrl ? 'Yes' : 'No'}`);
+  }
+
+  // Helper method to set PDF preview path
+  setPdfPreviewPath(template: string, category: string) {
+    // Map specific templates to their PDF files
+    const templatePdfMap: { [key: string]: string } = {
+      // Affidavit templates
+      'Affidavit of Death': '/assets/templates/Affidavit of Death.pdf',
+      'Affidavit of Domicile': '/assets/templates/Affidavit of Domicile.pdf',
+      'Affidavit of Gift': '/assets/templates/Affidavit of Gift.pdf',
+      'Affidavit of Heirship': '/assets/templates/Affidavit of Heirship.pdf',
+      'Affidavit of Paternity': '/assets/templates/Affidavit of Paternity.pdf',
+      'Affidavit of Residency': '/assets/templates/Affidavit of Residency.pdf',
+      'Financial Affidavit': '/assets/templates/Financial Affidavit.pdf',
+      'Small Estate Affidavit': '/assets/templates/Small Estate Affidavit.pdf',
+      
+      // Other templates - fallback to category-based
+      'Basic MNDA Template': '/assets/templates/NDA.pdf',
+      'Basic ENDA Template': '/assets/templates/NDA.pdf',
+      'Comprehensive MNDA Template': '/assets/templates/NDA.pdf',
+      'One-Way NDA for Employees': '/assets/templates/NDA.pdf',
+      'ENDA for New Employees': '/assets/templates/NDA.pdf',
+      
+      'Basic MOU Template': '/assets/templates/MOU.pdf',
+      'MOU for Software Development': '/assets/templates/MOU.pdf',
+      
+      'Basic Partnership Agreement Template': '/assets/templates/Partnership-Agreement.pdf',
+      'Business Partnership Agreement for Small Business': '/assets/templates/Partnership-Agreement.pdf',
+      'Business Partnership Agreement Template': '/assets/templates/Partnership-Agreement.pdf',
+      
+      'Basic Affidavit Template': '/assets/templates/Affidavit of Death.pdf', // Use a sample affidavit
+      'Affidavit of Employment': '/assets/templates/Employment Verification Letter.pdf'
+    };
+
+    // First try to get template-specific PDF
+    if (templatePdfMap[template]) {
+      this.selectedPdfPath = templatePdfMap[template];
+      console.log(`✅ Template-specific PDF found: ${this.selectedPdfPath}`);
+    } else {
+      // Fallback to category-based PDF
+      switch(category) {
+        case 'NDA':
+          this.selectedPdfPath = '/assets/templates/NDA.pdf';
+          break;
+        case 'MOU':
+          this.selectedPdfPath = '/assets/templates/MOU.pdf';
+          break;
+        case 'Partnership Agreement':
+          this.selectedPdfPath = '/assets/templates/Partnership-Agreement.pdf';
+          break;
+        case 'Affidavits':
+          // For affidavit templates without specific PDF, use generic Affidavits.pdf
+          if (template && template.toLowerCase().includes('affidavit')) {
+            this.selectedPdfPath = '/assets/templates/Affidavit of Death.pdf'; // Use sample
+          } else {
+            this.selectedPdfPath = '/assets/templates/Affidavit of Death.pdf'; // Use sample
+          }
+          break;
+        default:
+          this.selectedPdfPath = '';
+          console.log(`❌ No PDF preview available for category: ${category}`);
+      }
+    }
+
+    // Create safe URL for PDF if path exists
+    if (this.selectedPdfPath) {
+      // Add PDF.js parameters for better viewing - for better browser compatibility
+      const pdfUrl = `${this.selectedPdfPath}#toolbar=1&navpanes=1&scrollbar=1&page=1&zoom=auto`;
+      this.safePdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
+      
+      console.log(`✅ PDF Preview set successfully: ${this.selectedPdfPath}`);
+      
+      // Test if PDF file exists by attempting to fetch it
+      fetch(this.selectedPdfPath)
+        .then(response => {
+          if (response.ok) {
+            console.log(`✅ PDF file confirmed accessible: ${this.selectedPdfPath}`);
+          } else {
+            console.log(`❌ PDF file not accessible (${response.status}): ${this.selectedPdfPath}`);
+          }
+        })
+        .catch(error => {
+          console.log(`❌ Error testing PDF accessibility: ${error.message}`);
+        });
+    } else {
+      this.safePdfUrl = null;
+      console.log(`❌ No PDF preview available for template: ${template}`);
+    }
+  }
+
+  // PDF loading error handling methods
+  onPdfLoadError() {
+    console.error('❌ PDF failed to load in iframe');
+    this.pdfLoadError = true;
+  }
+
+  onPdfLoaded() {
+    console.log('✅ PDF loaded successfully in iframe');
+    this.pdfLoadError = false;
   }
 
   // New method to handle "Next" button click
   onNextClick() {
     const category = this.stepForm.get('category')?.value;
+    const template = this.stepForm.get('template')?.value;
     this.showSplitView = true;
     
-    // Set PDF path based on category (using assets folder)
-    switch(category) {
-      case 'NDA':
-        this.selectedPdfPath = '/assets/templates/NDA.pdf';
-        break;
-      case 'MOU':
-        this.selectedPdfPath = '/assets/templates/MOU.pdf';
-        break;
-      case 'Partnership Agreement':
-        this.selectedPdfPath = '/assets/templates/Partnership-Agreement.pdf';
-        break;
-      case 'Affidavits':
-        this.selectedPdfPath = '/assets/templates/Affidavits.pdf';
-        break;
-      default:
-        this.selectedPdfPath = '';
-    }
-    
-    // Create safe URL for PDF
-    if (this.selectedPdfPath) {
-      // Add PDF.js parameters for better viewing
-      const pdfUrl = `${this.selectedPdfPath}#toolbar=1&navpanes=1&scrollbar=1&page=1&zoom=auto`;
-      this.safePdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(pdfUrl);
-    }
+    // Use the helper method to set PDF path
+    this.setPdfPreviewPath(template, category);
     
     // Add context message to chat
     this.chatMessages.push({
@@ -163,17 +261,58 @@ export class AppComponent {
         timestamp: new Date()
       });
       
-      // Simulate bot response (you can integrate with actual AI later)
-      setTimeout(() => {
-        this.chatMessages.push({
-          text: this.generateBotResponse(this.currentMessage),
-          isUser: false,
-          timestamp: new Date()
-        });
-      }, 1000);
+      // Call actual AI assistant instead of simulated response
+      this.callAIAssistant(this.currentMessage);
       
       this.currentMessage = '';
     }
+  }
+
+  callAIAssistant(userMessage: string) {
+    const template = this.stepForm.get('template')?.value || 'Basic Partnership Agreement Template';
+    
+    const request = {
+      question: userMessage,
+      document_template: template,
+      current_template_content: ''
+    };
+
+    this.documentService.askAIAssistant(request).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.chatMessages.push({
+            text: response.answer,
+            isUser: false,
+            timestamp: new Date()
+          });
+          
+          // Add guidance if available
+          if (response.guidance && response.guidance !== response.answer) {
+            setTimeout(() => {
+              this.chatMessages.push({
+                text: `💡 Additional Guidance: ${response.guidance}`,
+                isUser: false,
+                timestamp: new Date()
+              });
+            }, 500);
+          }
+        } else {
+          this.chatMessages.push({
+            text: "Sorry, I'm having trouble processing your request right now. Please try again.",
+            isUser: false,
+            timestamp: new Date()
+          });
+        }
+      },
+      error: (error) => {
+        console.error('AI Assistant error:', error);
+        this.chatMessages.push({
+          text: "I apologize, but I'm experiencing technical difficulties. Please try again or contact support.",
+          isUser: false,
+          timestamp: new Date()
+        });
+      }
+    });
   }
 
   generateBotResponse(userMessage: string): string {
@@ -452,20 +591,48 @@ export class AppComponent {
 
   downloadGeneratedPdf() {
     if (this.generatedDocumentId) {
+      console.log(`🔄 Attempting to download PDF for document ID: ${this.generatedDocumentId}`);
+      
       this.documentService.downloadPdf(this.generatedDocumentId).subscribe({
         next: (blob: Blob) => {
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `legal_document_${this.generatedDocumentId}.pdf`;
-          link.click();
-          window.URL.revokeObjectURL(url);
+          console.log(`✅ PDF blob received. Size: ${blob.size} bytes`);
+          
+          if (blob.size > 0) {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `legal_document_${this.generatedDocumentId}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            console.log(`✅ PDF download initiated successfully`);
+          } else {
+            console.error('❌ Received empty PDF blob');
+            alert('Error: Received empty PDF file. Please try generating the document again.');
+          }
         },
         error: (error) => {
-          console.error('PDF download error:', error);
-          alert('Error downloading PDF. Please try again.');
+          console.error('❌ PDF download error:', error);
+          
+          let errorMessage = 'Error downloading PDF. ';
+          if (error.status === 404) {
+            errorMessage += 'PDF file not found. Please try generating the document again.';
+          } else if (error.status === 500) {
+            errorMessage += 'Server error occurred. Please try again later.';
+          } else if (error.status === 0) {
+            errorMessage += 'Cannot connect to server. Please check if the backend is running.';
+          } else {
+            errorMessage += `Server responded with error ${error.status}. Please try again.`;
+          }
+          
+          alert(errorMessage);
         }
       });
+    } else {
+      console.error('❌ No document ID available for PDF download');
+      alert('Error: No document ID found. Please generate a document first.');
     }
   }
 
@@ -807,7 +974,7 @@ export class AppComponent {
           <script>
             // Download PDF function
             function downloadPdf() {
-              fetch('http://localhost:8001${response.pdf_url}')
+              fetch('http://localhost:8000${response.pdf_url}')
                 .then(response => {
                   if (!response.ok) throw new Error('Download failed');
                   return response.blob();
@@ -902,3 +1069,4 @@ export class AppComponent {
   }
 
 }
+ 
